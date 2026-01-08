@@ -54,9 +54,7 @@ export async function PATCH(req: Request) {
                 title: "Status Akun Diperbarui 🎉",
                 message: `Selamat! Status akun Anda telah diperbarui menjadi ${level.toUpperCase()}. Nikmati harga lebih murah sekarang!`,
                 type: "info",
-                read: false,
-                createdAt: new Date(),
-                updatedAt: new Date()
+                read: false
             });
         }
 
