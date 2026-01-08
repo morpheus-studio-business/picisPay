@@ -15,7 +15,22 @@ export const user = pgTable("user", {
     storeAddress: text("store_address"),
     balance: integer("balance").default(0).notNull(),
     defaultMargin: integer("default_margin").default(2000).notNull(),
-    role: text("role").default("user").notNull(), // 'admin' or 'user'
+    role: text("role").default("user").notNull(),
+    level: text("level").default("member").notNull(),
+    pin: text("pin"), // Hashed PIN for transactions
+});
+
+// ... (existing code) ...
+
+// Transaction Logs (Phase 3) - For debugging raw provider responses
+export const transactionLogs = pgTable("transaction_logs", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    referenceId: text("reference_id"), // Changed from uuid transactionId to text referenceId
+    provider: text("provider").notNull(), // 'digiflazz', 'pakasir'
+    type: text("type").notNull(), // 'request', 'response', 'webhook'
+    payload: text("payload"), // JSON string
+    statusCode: integer("status_code"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Better Auth - Sessions table
@@ -136,4 +151,24 @@ export const categoryMappings = pgTable("category_mappings", {
     priority: integer("priority").default(0).notNull(), // Display order (lower = first)
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// System Configuration (Phase 1)
+export const configuration = pgTable("configuration", {
+    key: text("key").primaryKey(), // e.g. 'site_name', 'wa_admin', 'maintenance_mode'
+    value: text("value").notNull(),
+    description: text("description"), // For admin context
+    updatedBy: text("updated_by"),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Banners (Phase 2)
+export const banners = pgTable("banners", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    imageUrl: text("image_url").notNull(),
+    title: text("title"),
+    linkUrl: text("link_url"),
+    isActive: boolean("is_active").default(true).notNull(),
+    priority: integer("priority").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 });

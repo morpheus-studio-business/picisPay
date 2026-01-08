@@ -26,7 +26,7 @@ export default function ProfilePage() {
     if (!session?.user) {
         return (
             <div className="min-h-screen bg-black text-white pb-24 font-sans">
-                <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 pt-8 pb-4 flex items-center gap-4">
+                <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 pt-8 pb-4 flex items-center gap-4 md:hidden">
                     <Link href="/" className="w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center text-white hover:bg-[#bef264] hover:text-black transition-colors">
                         <ChevronLeft className="w-6 h-6" />
                     </Link>
@@ -55,12 +55,17 @@ export default function ProfilePage() {
     return (
         <div className="min-h-screen bg-black text-white pb-24 font-sans">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 pt-8 pb-4 flex items-center gap-4">
+            <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 pt-8 pb-4 flex items-center gap-4 md:hidden">
                 <Link href="/" className="w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center text-white hover:bg-[#bef264] hover:text-black transition-colors">
                     <ChevronLeft className="w-6 h-6" />
                 </Link>
                 <h1 className="text-lg font-bold">Profil Saya</h1>
             </header>
+
+            {/* Desktop Title */}
+            <div className="hidden md:flex items-center justify-between px-6 py-8 border-b border-white/10 mb-6">
+                <h1 className="text-3xl font-bold">Profil Saya</h1>
+            </div>
 
             {/* Profile Info */}
             <div className="px-6 py-8 flex flex-col items-center">
@@ -80,7 +85,8 @@ export default function ProfilePage() {
                 <p className="text-neutral-500 text-sm">{session.user.email}</p>
                 <div className="mt-3 bg-[#bef264]/10 px-3 py-1 rounded-full border border-[#bef264]/20">
                     <span className="text-xs font-bold text-[#bef264] uppercase tracking-wider">
-                        {(session.user as any).role === 'admin' ? 'Administrator' : 'Member'}
+                        {/* Prioritize Level display, if Admin show Admin */}
+                        {(session.user as any).role === 'admin' ? 'Administrator' : ((session.user as any).level || 'Member')}
                     </span>
                 </div>
             </div>

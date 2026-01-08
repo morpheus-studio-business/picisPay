@@ -102,8 +102,8 @@ export default function HistoryPage() {
 
     return (
         <div className="min-h-screen bg-black text-white pb-24 font-sans print:bg-white print:text-black">
-            {/* Header - Hide on Print */}
-            <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 pt-8 pb-4 flex items-center justify-between print:hidden">
+            {/* Header - Hide on Print and Desktop */}
+            <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-white/5 px-6 pt-8 pb-4 flex items-center justify-between print:hidden md:hidden">
                 <div className="flex items-center gap-4">
                     <Link href="/" className="w-10 h-10 rounded-full bg-neutral-900 flex items-center justify-center text-white hover:bg-[#bef264] hover:text-black transition-colors">
                         <ChevronLeft className="w-6 h-6" />
@@ -114,6 +114,11 @@ export default function HistoryPage() {
                     <Filter className="w-5 h-5" />
                 </button> */}
             </header>
+
+            {/* Desktop Title */}
+            <div className="hidden md:flex items-center justify-between px-6 py-8 border-b border-white/10 mb-6">
+                <h1 className="text-3xl font-bold">Riwayat Transaksi</h1>
+            </div>
 
             {/* Tabs - Hide on Print */}
             <div className="px-6 py-4 flex gap-2 overflow-x-auto scrollbar-hide print:hidden">

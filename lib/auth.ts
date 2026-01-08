@@ -24,7 +24,8 @@ export const auth = betterAuth({
             storeAddress: { type: "string" },
             balance: { type: "number" },
             defaultMargin: { type: "number" },
-            role: { type: "string" }
+            role: { type: "string" },
+            level: { type: "string" }
         }
     }
 });

@@ -1,12 +1,93 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ChevronLeft, Key, Lock, ArrowRight } from 'lucide-react';
+import { ChevronLeft, Key, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { changePassword } from '@/lib/auth-client';
 
 export default function PinPage() {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState('pin'); // 'pin' or 'password'
+
+    // PIN State
+    const [oldPin, setOldPin] = useState('');
+    const [newPin, setNewPin] = useState('');
+    const [pinLoading, setPinLoading] = useState(false);
+
+    // Password State
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passLoading, setPassLoading] = useState(false);
+
+    const handleUpdatePin = async () => {
+        if (newPin.length !== 6) {
+            alert('PIN harus 6 digit angka');
+            return;
+        }
+        setPinLoading(true);
+        try {
+            const res = await fetch('/api/user/pin', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pin: newPin,
+                    oldPin: oldPin
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('PIN berhasil diperbarui!');
+                setOldPin('');
+                setNewPin('');
+                router.push('/profile');
+            } else {
+                alert(data.error || 'Gagal mengubah PIN');
+            }
+        } catch (error) {
+            alert('Terjadi kesalahan');
+        } finally {
+            setPinLoading(false);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert('Semua kolom harus diisi');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            alert('Konfirmasi password tidak cocok');
+            return;
+        }
+        if (newPassword.length < 8) {
+            alert('Password minimal 8 karakter');
+            return;
+        }
+
+        setPassLoading(true);
+        try {
+            await changePassword({
+                newPassword: newPassword,
+                currentPassword: currentPassword,
+                revokeOtherSessions: true
+            }, {
+                onSuccess: () => {
+                    alert('Password berhasil diubah!');
+                    router.push('/profile');
+                },
+                onError: (ctx) => {
+                    alert(ctx.error.message || "Gagal mengubah password");
+                }
+            });
+        } catch (error) {
+            // Error managed by onError callback usually
+        } finally {
+            setPassLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-black text-white pb-24 font-sans">
@@ -43,21 +124,39 @@ export default function PinPage() {
                             <Key className="w-8 h-8 text-[#bef264]" />
                         </div>
                         <h2 className="text-center font-bold text-xl mb-2">Ubah PIN Transaksi</h2>
-                        <p className="text-center text-neutral-500 text-xs mb-8">Masukkan 6 digit PIN lama Anda untuk verifikasi.</p>
+                        <p className="text-center text-neutral-500 text-xs mb-8">Masukkan 6 digit angka untuk keamanan transaksi.</p>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">PIN Lama</label>
-                                <input type="password" placeholder="******" className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-center text-white focus:outline-none focus:border-[#bef264] transition-colors font-bold text-2xl tracking-[0.5em]" maxLength={6} />
+                                <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">PIN Lama (Opsional jika belum ada)</label>
+                                <input
+                                    type="password"
+                                    value={oldPin}
+                                    onChange={(e) => setOldPin(e.target.value)}
+                                    placeholder="******"
+                                    className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-center text-white focus:outline-none focus:border-[#bef264] transition-colors font-bold text-2xl tracking-[0.5em]"
+                                    maxLength={6}
+                                />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">PIN Baru</label>
-                                <input type="password" placeholder="******" className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-center text-white focus:outline-none focus:border-[#bef264] transition-colors font-bold text-2xl tracking-[0.5em]" maxLength={6} />
+                                <input
+                                    type="password"
+                                    value={newPin}
+                                    onChange={(e) => setNewPin(e.target.value)}
+                                    placeholder="******"
+                                    className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-center text-white focus:outline-none focus:border-[#bef264] transition-colors font-bold text-2xl tracking-[0.5em]"
+                                    maxLength={6}
+                                />
                             </div>
                         </div>
 
-                        <button className="w-full bg-[#bef264] text-black font-bold rounded-2xl py-4 mt-8 hover:bg-[#bef264]/90 transition-colors flex items-center justify-center gap-2">
-                            Lanjut <ArrowRight className="w-5 h-5" />
+                        <button
+                            onClick={handleUpdatePin}
+                            disabled={pinLoading}
+                            className="w-full bg-[#bef264] text-black font-bold rounded-2xl py-4 mt-8 hover:bg-[#bef264]/90 transition-colors flex items-center justify-center gap-2"
+                        >
+                            {pinLoading ? <Loader2 className="animate-spin" /> : <>Simpan PIN <ArrowRight className="w-5 h-5" /></>}
                         </button>
                     </motion.div>
                 ) : (
@@ -71,20 +170,42 @@ export default function PinPage() {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Password Saat Ini</label>
-                                <input type="password" placeholder="••••••••" className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white focus:outline-none focus:border-[#bef264] transition-colors font-medium" />
+                                <input
+                                    type="password"
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white focus:outline-none focus:border-[#bef264] transition-colors font-medium"
+                                />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Password Baru</label>
-                                <input type="password" placeholder="••••••••" className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white focus:outline-none focus:border-[#bef264] transition-colors font-medium" />
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white focus:outline-none focus:border-[#bef264] transition-colors font-medium"
+                                />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Konfirmasi Password</label>
-                                <input type="password" placeholder="••••••••" className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white focus:outline-none focus:border-[#bef264] transition-colors font-medium" />
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white focus:outline-none focus:border-[#bef264] transition-colors font-medium"
+                                />
                             </div>
                         </div>
 
-                        <button className="w-full bg-[#bef264] text-black font-bold rounded-2xl py-4 mt-8 hover:bg-[#bef264]/90 transition-colors">
-                            Simpan Password
+                        <button
+                            onClick={handleChangePassword}
+                            disabled={passLoading}
+                            className="w-full bg-[#bef264] text-black font-bold rounded-2xl py-4 mt-8 hover:bg-[#bef264]/90 transition-colors flex items-center justify-center gap-2"
+                        >
+                            {passLoading ? <Loader2 className="animate-spin" /> : 'Simpan Password'}
                         </button>
                     </motion.div>
                 )}

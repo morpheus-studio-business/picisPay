@@ -40,6 +40,10 @@ export const metadata: Metadata = {
   },
 };
 
+import { SiteHeader } from "@/components/site-header";
+
+// ... existing code ...
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -55,8 +59,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#121212] min-h-screen flex justify-center`}
       >
-        <div className="w-full max-w-[430px] bg-black min-h-screen shadow-2xl relative overflow-x-hidden">
-          {children}
+        <div className="w-full md:max-w-full md:w-full md:shadow-none max-w-[430px] bg-black min-h-screen shadow-2xl relative overflow-x-hidden flex flex-col">
+          <SiteHeader />
+          <div className="w-full md:max-w-7xl md:mx-auto flex-1">
+            {children}
+          </div>
         </div>
       </body>
     </html>

@@ -14,17 +14,18 @@ import {
     Package,
     Layers,
     Loader2,
+    Image,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 
 const menuItems = [
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { name: "Products", href: "/admin/products", icon: Package },
-    { name: "Categories", href: "/admin/categories", icon: Layers },
-    { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Top-ups", href: "/admin/topups", icon: CreditCard },
+    { name: "Overview", href: "/admin", icon: LayoutDashboard },
     { name: "Transactions", href: "/admin/transactions", icon: ShoppingCart },
+    { name: "Products", href: "/admin/products", icon: Package },
+    { name: "Users", href: "/admin/users", icon: Users },
+    { name: "Deposits", href: "/admin/topups", icon: CreditCard },
+    { name: "Banners", href: "/admin/banners", icon: Image },
     { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

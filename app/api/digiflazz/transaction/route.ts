@@ -4,6 +4,7 @@ import { db, transactions, user, balanceHistory, notifications } from "@/lib/db"
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
+import { logTransaction } from "@/lib/logger";
 
 const DIGIFLAZZ_URL = "https://api.digiflazz.com/v1/transaction";
 
@@ -73,24 +74,43 @@ export async function POST(request: NextRequest) {
             .update(username + apiKey + transactionRefId)
             .digest("hex");
 
+        const payload = {
+            username,
+            buyer_sku_code,
+            customer_no,
+            ref_id: transactionRefId,
+            sign,
+        };
+
+        // Log Request
+        await logTransaction({
+            provider: 'digiflazz',
+            type: 'request',
+            payload,
+            transactionId: transactionRefId // We don't have UUID here yet, using RefID is fine for correlation or we update later
+        });
+
         const response = await fetch(DIGIFLAZZ_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username,
-                buyer_sku_code,
-                customer_no,
-                ref_id: transactionRefId,
-                sign,
-            }),
+            body: JSON.stringify(payload),
         });
 
         const data = await response.json();
 
+        // Log Response
+        await logTransaction({
+            provider: 'digiflazz',
+            type: 'response',
+            payload: data,
+            transactionId: transactionRefId,
+            statusCode: response.status
+        });
+
         // 6. Save Transaction Record
         const status = data.data?.status || (data.data?.rc === '00' ? 'success' : 'pending'); // Digiflazz sometimes pending or success
 
-        await db.insert(transactions).values({
+        const insertedTx = await db.insert(transactions).values({
             userId: session.user.id,
             refId: transactionRefId,
             buyerSkuCode: buyer_sku_code,
@@ -100,7 +120,9 @@ export async function POST(request: NextRequest) {
             status: status,
             sn: data.data?.sn || null,
             message: data.data?.message || data.data?.rc || null,
-        });
+        }).returning({ id: transactions.id });
+
+        // Update logs with real UUID if needed (optional optimization)
 
         // If Failed from Digiflazz, Refund!
         if (data.data?.status === 'Gagal' || data.data?.rc === '02') {
@@ -149,6 +171,14 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error("Transaction Error:", error);
+
+        await logTransaction({
+            provider: 'digiflazz',
+            type: 'request', // System error treated as request failure
+            payload: { error: JSON.stringify(error) },
+            statusCode: 500
+        });
+
         // If generic error after deduction but before API call implies risk. 
         // For production, use DB Transactions (db.transaction)
         return NextResponse.json(
