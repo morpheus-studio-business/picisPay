@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Wifi, Phone, Loader2, X, Smartphone } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import InsufficientBalanceModal from '@/components/InsufficientBalanceModal';
 
 interface Product {
@@ -191,7 +191,7 @@ const extractSubCategory = (productName: string): string => {
     return 'Reguler';
 };
 
-export default function DataPage() {
+function DataPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
@@ -863,5 +863,13 @@ export default function DataPage() {
                 requiredAmount={balanceInfo.required}
             />
         </div>
+    );
+}
+
+export default function DataPage() {
+    return (
+        <Suspense fallback={<div className='min-h-screen bg-black flex items-center justify-center'><Loader2 className='w-8 h-8 animate-spin text-[#bef264]' /></div>}>
+            <DataPageContent />
+        </Suspense>
     );
 }
