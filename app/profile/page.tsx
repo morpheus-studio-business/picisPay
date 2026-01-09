@@ -138,7 +138,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {/* General Settings */}
+                {/* General Settings - HIDDEN (Placeholder)
                 <div>
                     <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3 pl-2">Umum</h3>
                     <div className="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden">
@@ -152,6 +152,7 @@ export default function ProfilePage() {
 
                     </div>
                 </div>
+                */}
 
                 {/* Logout */}
                 <button

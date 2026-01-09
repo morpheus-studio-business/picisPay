@@ -16,7 +16,7 @@ export default function SecurityPage() {
 
             <div className="px-6 py-8 space-y-8">
 
-                {/* Verification */}
+                {/* Verification - DISABLED (Future Feature)
                 <div>
                     <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3 pl-2">Verifikasi</h3>
                     <div className="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden">
@@ -47,8 +47,9 @@ export default function SecurityPage() {
                         </div>
                     </div>
                 </div>
+                */}
 
-                {/* Login Activity */}
+                {/* Login Activity - DISABLED (Future Feature)
                 <div>
                     <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3 pl-2">Login Aktif</h3>
                     <div className="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden">
@@ -74,6 +75,12 @@ export default function SecurityPage() {
                             </button>
                         </div>
                     </div>
+                </div>
+                */}
+
+                <div className="py-12 flex flex-col items-center justify-center text-neutral-500">
+                    <Shield className="w-16 h-16 mb-4 opacity-20" />
+                    <p className="text-sm text-center">Fitur keamanan tambahan<br />segera hadir.</p>
                 </div>
 
             </div>
