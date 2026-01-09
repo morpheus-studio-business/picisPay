@@ -39,7 +39,6 @@ export default function ScannerModal({ isOpen, onClose, onScanSuccess }: Scanner
                     html5Qrcode.stop().then(() => {
                         setIsScanning(false);
                         onScanSuccess(decodedText);
-                        onClose();
                     }).catch(console.error);
                 },
                 () => { }

@@ -647,7 +647,35 @@ export default function ProviderPage() {
                 isOpen={showScanner}
                 onClose={() => router.back()}
                 onScanSuccess={(code) => {
-                    setVoucherCode(code);
+                    // Cleaner function inside the callback for simplicity or define outside
+                    // Extract numbers: 10-20 digits usually
+                    let cleanCode = code;
+
+                    // 1. Try to find sn=... params
+                    const urlMatch = code.match(/[?&]sn=([^&]+)/i);
+                    if (urlMatch && urlMatch[1]) {
+                        cleanCode = urlMatch[1];
+                    } else {
+                        // 2. Or just extract the longest sequence of digits
+                        const digitSequences = code.match(/\d{10,}/g);
+                        if (digitSequences && digitSequences.length > 0) {
+                            // Take the longest one that looks like an SN
+                            cleanCode = digitSequences.reduce((a, b) => a.length > b.length ? a : b);
+                        } else {
+                            // Fallback: Remove non-alphanumeric if it looks like a direct code, or just keep as is
+                            // But for vouchers, usually just numbers.
+                            // Dealing with *123*...#
+                            const ussdMatch = code.match(/\*.*?(\d+).*?#/);
+                            if (ussdMatch) {
+                                cleanCode = ussdMatch[1];
+                            }
+                        }
+                    }
+
+                    // Remove non-alphanumeric just in case, but usually SN is digits
+                    cleanCode = cleanCode.replace(/[^a-zA-Z0-9]/g, '');
+
+                    setVoucherCode(cleanCode);
                     router.back();
                 }}
             />

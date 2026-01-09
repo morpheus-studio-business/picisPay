@@ -304,39 +304,39 @@ export default function Home() {
 
       <main className="md:max-w-7xl md:mx-auto md:px-8 md:py-8 space-y-8">
 
-        {/* Hero Grid Wrapper */}
-        <div className="bg-black text-white font-sans md:grid md:grid-cols-12 md:gap-8">
+        {/* Hero Stack Wrapper */}
+        <div className="bg-black text-white font-sans flex flex-col gap-8">
 
           {/* Balance Card - Lime Green & Black */}
-          <div className="px-4 mb-6 md:col-span-4 md:mb-0 md:px-0">
+          <div className="px-4 md:px-0">
             <motion.div
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="bg-linear-to-br from-[#bef264] to-[#84cc16] rounded-[1.5rem] md:rounded-[2.5rem] px-5 py-4 md:p-8 relative overflow-hidden shadow-2xl hover:shadow-[#bef264]/20 transition-all duration-500 min-h-[80px] md:min-h-[400px] flex flex-col justify-center"
+              className="bg-linear-to-br from-[#bef264] to-[#84cc16] rounded-[1.5rem] md:rounded-[2.5rem] px-5 py-4 md:px-8 md:py-6 relative overflow-hidden shadow-2xl hover:shadow-[#bef264]/20 transition-all duration-500 min-h-[80px] flex flex-col justify-center"
             >
               {/* Abstract Pattern */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-black/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
-              <div className="relative z-10 flex flex-row md:flex-col-reverse justify-between items-center md:items-start flex-1 gap-4 md:gap-0">
+              <div className="relative z-10 flex flex-row justify-between items-center flex-1 gap-4">
 
-                {/* Balance Text (Left on Mobile, Bottom on Desktop) */}
-                <div className="text-left flex-1 md:flex-none md:mt-auto">
-                  {/* Label only visible on desktop */}
+                {/* Balance Text */}
+                <div className="text-left flex-1">
+                  {/* Label visible on desktop */}
                   <p className="hidden md:block text-sm text-black/70 mb-1 font-medium tracking-wide">Total Saldo</p>
-                  <h2 className="text-2xl md:text-[3.5rem] leading-none font-black tracking-tighter text-black">
-                    <span className="text-sm md:text-2xl align-top mr-0.5 font-bold opacity-60">Rp</span>
+                  <h2 className="text-2xl md:text-4xl leading-none font-black tracking-tighter text-black">
+                    <span className="text-sm md:text-xl align-top mr-0.5 font-bold opacity-60">Rp</span>
                     {balance.toLocaleString('id-ID')}
                   </h2>
                 </div>
 
-                {/* Quick Actions (+ Icon) (Right on Mobile, Top on Desktop) */}
+                {/* Quick Actions (+ Icon) */}
                 <div className="flex-shrink-0">
                   <Link href="/topup" onClick={(e) => handleProtectedClick(e, '/topup')}>
                     <div className="flex flex-col items-center gap-2 cursor-pointer group">
-                      <div className="w-10 h-10 md:w-14 md:h-14 bg-black rounded-xl md:rounded-[1.2rem] flex items-center justify-center transition-transform active:scale-95 border border-black/5 group-hover:bg-neutral-900 shadow-sm">
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-xl md:rounded-2xl flex items-center justify-center transition-transform active:scale-95 border border-black/5 group-hover:bg-neutral-900 shadow-sm">
                         <Plus className="w-5 h-5 md:w-6 md:h-6 text-[#bef264] transition-colors" />
                       </div>
-                      {/* Label only visible on desktop */}
+                      {/* Label visible on desktop */}
                       <span className="hidden md:block text-[11px] text-black/80 font-semibold group-hover:text-black">Isi Saldo</span>
                     </div>
                   </Link>
@@ -346,15 +346,15 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Promo Banner Desktop - Placed here to sit aside Balance on desktop */}
-          <div className="px-6 mb-8 md:col-span-8 md:mb-0 md:px-0 flex flex-col justify-center">
+          {/* Promo Banner */}
+          <div className="px-6 md:px-0 flex flex-col justify-center">
             <div className="mb-5 flex justify-between items-end">
               <h3 className="font-bold text-sm tracking-widest text-neutral-500 uppercase">Promo Spesial</h3>
             </div>
             <BannerSlider />
           </div>
 
-          {/* Close Grid Wrapper */}
+          {/* Close Stack Wrapper */}
         </div>
 
         {/* Services Grid Wrapper */}
