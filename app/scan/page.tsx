@@ -114,11 +114,11 @@ export default function ScanPage() {
 
     useEffect(() => {
         return () => {
-            if (scannerRef.current) {
+            if (scannerRef.current && isScanning) {
                 scannerRef.current.stop().catch(() => { });
             }
         };
-    }, []);
+    }, [isScanning]);
 
     return (
         <div className="min-h-screen bg-black text-white font-sans flex flex-col">
