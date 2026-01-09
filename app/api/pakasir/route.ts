@@ -99,23 +99,56 @@ export async function POST(request: NextRequest) {
         // SAFE BET: Use the `api/pakasir/route.ts` to return the URL.
         // And update the frontend `app/topup/page.tsx` to handle `payment_url`.
 
-        const paymentUrl = `https://app.pakasir.com/pay/${project}/${amount}?order_id=${orderId}`;
+        // Call Pakasir API to get Direct QR String
+        try {
+            const apiRes = await fetch(`https://app.pakasir.com/api/transactioncreate/${payment_method}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    project: project,
+                    order_id: orderId,
+                    amount: amount,
+                    api_key: apiKey
+                })
+            });
 
-        // Update DB with this info? Not needed yet.
+            const apiData = await apiRes.json();
 
-        return NextResponse.json({
-            success: true,
-            data: {
-                order_id: orderId,
-                amount: amount,
-                fee: 0,
-                total_payment: amount,
-                payment_method: payment_method,
-                payment_number: paymentUrl, // Use URL as "number" to display QR? No.
-                payment_url: paymentUrl,
-                expired_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24h
+            // Log raw response for debugging (optional, remove in prod or use logger)
+            console.log("Pakasir Response:", apiData);
+
+            if (!apiData.payment) {
+                // Handle case where API fails or structure is different
+                return NextResponse.json(
+                    { success: false, error: "Failed to get QR Code from provider" },
+                    { status: 502 }
+                );
             }
-        });
+
+            const payment = apiData.payment;
+
+            // Return the real data from API
+            return NextResponse.json({
+                success: true,
+                data: {
+                    order_id: payment.order_id,
+                    amount: payment.amount,
+                    fee: payment.fee,
+                    total_payment: payment.total_payment,
+                    payment_method: payment.payment_method,
+                    payment_number: payment.payment_number, // This IS the QR String for QRIS
+                    expired_at: payment.expired_at,
+                    payment_url: null // We don't need this anymore for QRIS direct
+                }
+            });
+
+        } catch (apiError) {
+            console.error("Pakasir API Error:", apiError);
+            return NextResponse.json(
+                { success: false, error: "Payment provider error" },
+                { status: 500 }
+            );
+        }
 
     } catch (error) {
         console.error("Topup Error:", error);

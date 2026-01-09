@@ -103,23 +103,28 @@ export default function TopUpPage() {
                         <div className="w-16 h-16 bg-[#bef264] rounded-full flex items-center justify-center mb-4">
                             <Wallet className="w-8 h-8 text-black" />
                         </div>
-                        <h2 className="text-black font-bold text-xl mb-2">Selesaikan Pembayaran</h2>
+                        <h2 className="text-black font-bold text-xl mb-2">Scan QRIS</h2>
                         <p className="text-neutral-600 text-sm mb-6 max-w-xs">
-                            Klik tombol di bawah untuk membuka halaman pembayaran resmi Pakasir/QRIS.
+                            Scan QR Code di bawah ini menggunakan e-wallet (GoPay, OVO, Dana, dll) atau M-Banking.
                         </p>
 
-                        <p className="text-black font-extrabold text-3xl mb-6">
+                        <div className="bg-white p-4 rounded-xl border-2 border-dashed border-neutral-300 mb-6">
+                            <QRCodeSVG
+                                value={paymentData.payment_number}
+                                size={220}
+                                level='M'
+                                includeMargin={true}
+                            />
+                        </div>
+
+                        <p className="text-black font-extrabold text-3xl mb-2">
                             Rp {paymentData.total_payment.toLocaleString('id-ID')}
                         </p>
+                        <p className="text-xs text-neutral-500 mb-4">Total Pembayaran</p>
 
-                        <a
-                            href={(paymentData as any).payment_url || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full bg-black text-white font-bold rounded-2xl py-4 hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
-                        >
-                            Bayar Sekarang ➔
-                        </a>
+                        <div className="w-full bg-yellow-50 text-yellow-800 text-xs px-4 py-3 rounded-xl border border-yellow-200">
+                            ⚠️ Pembayaran akan otomatis terdeteksi dalam 1-5 menit. Jangan tutup halaman ini sebelum pembayaran berhasil.
+                        </div>
                     </div>
 
                     {/* Order Info */}
