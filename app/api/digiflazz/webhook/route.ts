@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db, transactions, user, balanceHistory } from "@/lib/db";
+import { db, transactions, user, balanceHistory, notifications } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
@@ -58,6 +58,17 @@ export async function POST(request: NextRequest) {
             updatedAt: new Date(),
         }).where(eq(transactions.refId, ref_id));
 
+        // Handle SUCCESS - Create success notification
+        if (status.toLowerCase() === "sukses") {
+            await db.insert(notifications).values({
+                userId: transaction.userId,
+                type: "transaction_success",
+                title: "Transaksi Berhasil! ✅",
+                message: `${transaction.productName || 'Produk'} ke ${transaction.customerNo} berhasil.${sn ? ` SN: ${sn}` : ''}`,
+                referenceId: ref_id
+            });
+        }
+
         // If transaction failed, refund the user
         // Status 'Gagal' logic
         if (status.toLowerCase() === "gagal" && transaction.status !== "gagal") {
@@ -81,6 +92,15 @@ export async function POST(request: NextRequest) {
                     balanceAfter: newBalance,
                     referenceId: ref_id,
                     description: `Refund (Webhook): ${message}`,
+                });
+
+                // Create failure notification
+                await db.insert(notifications).values({
+                    userId: userRecord.id,
+                    type: "transaction_failed",
+                    title: "Transaksi Gagal ❌",
+                    message: `${transaction.productName || 'Produk'} ke ${transaction.customerNo} gagal. Saldo dikembalikan.`,
+                    referenceId: ref_id
                 });
 
                 console.log(`Refunded ${transaction.price} to user ${userRecord.id} due to failed transaction ${ref_id}`);
