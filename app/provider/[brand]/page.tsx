@@ -2,8 +2,9 @@
 
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2, Smartphone, CreditCard, Signal, MessageSquare, Clock, Wifi, X, Ticket, ScanLine } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import ScannerModal from '@/components/ScannerModal';
 
 interface Product {
     product_name: string;
@@ -200,6 +201,7 @@ const PROVIDER_MENUS: ServiceMenu[] = [
 export default function ProviderPage() {
     const router = useRouter();
     const params = useParams();
+    const searchParams = useSearchParams();
     const brandSlug = params.brand as string;
     const brandName = BRAND_MAP[brandSlug] || brandSlug.toUpperCase();
 
@@ -211,6 +213,53 @@ export default function ProviderPage() {
     const [buying, setBuying] = useState<string | null>(null);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [voucherCode, setVoucherCode] = useState('');
+    const [showScanner, setShowScanner] = useState(false);
+
+    // Sync state with URL params
+    useEffect(() => {
+        const menuParam = searchParams.get('menu');
+        const subParam = searchParams.get('sub');
+        const productParam = searchParams.get('product');
+        const scanParam = searchParams.get('scan');
+
+        // Sync Menu
+        if (menuParam) {
+            const menu = PROVIDER_MENUS.find(m => m.id === menuParam);
+            setSelectedMenu(menu || null);
+        } else {
+            setSelectedMenu(null);
+        }
+
+        // Sync SubCategory
+        if (subParam) {
+            setSelectedSubCategory(subParam);
+        } else {
+            setSelectedSubCategory(null);
+        }
+
+        // Sync Scanner
+        setShowScanner(scanParam === 'true');
+
+        // Sync Product (only if loaded)
+        if (productParam && allProducts.length > 0) {
+            const product = allProducts.find(p => p.buyer_sku_code === productParam);
+            if (product) setSelectedProduct(product);
+        } else if (!productParam) {
+            setSelectedProduct(null);
+        }
+
+    }, [searchParams, allProducts]);
+
+    const updateParams = useCallback((updates: Record<string, string | null>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        Object.entries(updates).forEach(([key, value]) => {
+            if (value === null) params.delete(key);
+            else params.set(key, value);
+        });
+
+        // Push to history
+        router.push(`?${params.toString()}`);
+    }, [searchParams, router]);
 
     useEffect(() => {
         fetchProducts();
@@ -327,8 +376,7 @@ export default function ProviderPage() {
 
             if (data.success) {
                 alert(`Transaksi berhasil! Status: ${data.data.status}`);
-                setSelectedProduct(null);
-                router.push('/');
+                updateParams({ product: null, menu: null });
             } else {
                 alert(`Gagal: ${data.error || 'Terjadi kesalahan'}`);
             }
@@ -340,16 +388,7 @@ export default function ProviderPage() {
     };
 
     const handleBack = () => {
-        if (selectedProduct) {
-            setSelectedProduct(null);
-        } else if (selectedSubCategory) {
-            setSelectedSubCategory(null);
-        } else if (selectedMenu) {
-            setSelectedMenu(null);
-            setSelectedSubCategory(null);
-        } else {
-            router.push('/');
-        }
+        router.back();
     };
 
     // View: Loading
@@ -392,12 +431,7 @@ export default function ProviderPage() {
                                     key={menu.id}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => {
-                                        // Redirect to /data for data menu with brand param
-                                        if (menu.id === 'data') {
-                                            router.push(`/data?brand=${brandName}`);
-                                            return;
-                                        }
-                                        setSelectedMenu(menu);
+                                        updateParams({ menu: menu.id });
                                     }}
                                     className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 cursor-pointer hover:border-[#bef264] hover:bg-neutral-800 transition-all group flex items-center gap-4"
                                 >
@@ -445,7 +479,7 @@ export default function ProviderPage() {
                                 <motion.div
                                     key={cat}
                                     whileTap={{ scale: 0.98 }}
-                                    onClick={() => setSelectedSubCategory(cat)}
+                                    onClick={() => updateParams({ sub: cat })}
                                     className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 cursor-pointer hover:border-[#bef264] hover:bg-neutral-800 transition-all group flex items-center gap-4"
                                 >
                                     {/* Provider Logo */}
@@ -512,7 +546,7 @@ export default function ProviderPage() {
                             className="flex-1 bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-[#bef264] uppercase tracking-wider"
                         />
                         <button
-                            onClick={() => router.push('/scan')}
+                            onClick={() => updateParams({ scan: 'true' })}
                             className="w-14 h-14 bg-[#bef264] rounded-2xl flex items-center justify-center text-black hover:bg-[#bef264]/80 transition-colors"
                         >
                             <ScanLine className="w-6 h-6" />
@@ -534,7 +568,7 @@ export default function ProviderPage() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 whileTap={{ scale: 0.98 }}
-                                onClick={() => setSelectedProduct(product)}
+                                onClick={() => updateParams({ product: product.buyer_sku_code })}
                                 className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 cursor-pointer hover:border-[#bef264] hover:bg-neutral-800 transition-all group"
                             >
                                 <div className="flex flex-col">
@@ -555,7 +589,7 @@ export default function ProviderPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="fixed inset-0 bg-black/80 z-50 flex items-end justify-center"
-                    onClick={() => !buying && setSelectedProduct(null)}
+                    onClick={() => !buying && router.back()}
                 >
                     <motion.div
                         initial={{ y: '100%' }}
@@ -567,7 +601,7 @@ export default function ProviderPage() {
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg font-bold">Konfirmasi Pembelian</h2>
                             <button
-                                onClick={() => !buying && setSelectedProduct(null)}
+                                onClick={() => !buying && router.back()}
                                 className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center"
                             >
                                 <X className="w-4 h-4" />
@@ -607,6 +641,16 @@ export default function ProviderPage() {
                     </motion.div>
                 </motion.div>
             )}
+
+            {/* Scanner Modal */}
+            <ScannerModal
+                isOpen={showScanner}
+                onClose={() => router.back()}
+                onScanSuccess={(code) => {
+                    setVoucherCode(code);
+                    router.back();
+                }}
+            />
         </div>
     );
 }
