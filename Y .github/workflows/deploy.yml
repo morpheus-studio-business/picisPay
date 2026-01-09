@@ -1,0 +1,55 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+          PAKASIR_PROJECT: ${{ secrets.PAKASIR_PROJECT }}
+          PAKASIR_API_KEY: ${{ secrets.PAKASIR_API_KEY }}
+          DIGIFLAZZ_USERNAME: ${{ secrets.DIGIFLAZZ_USERNAME }}
+          DIGIFLAZZ_API_KEY: ${{ secrets.DIGIFLAZZ_API_KEY }}
+          DIGIFLAZZ_WEBHOOK_SECRET: ${{ secrets.DIGIFLAZZ_WEBHOOK_SECRET }}
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: ".next/*"
+          target: "/var/www/picisPay/"
+          overwrite: true
+
+      - name: Restart PM2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /var/www/picisPay
+            pm2 restart picispay
