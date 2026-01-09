@@ -172,3 +172,17 @@ export const banners = pgTable("banners", {
     priority: integer("priority").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Brands (Provider & Games icons)
+export const brands = pgTable("brands", {
+    id: text("id").primaryKey(), // slug: "axis", "telkomsel", "mobilelegends"
+    name: text("name").notNull(),
+    category: text("category").notNull(), // "data", "streaming", "games", "ewallet"
+    iconHome: text("icon_home"), // URL for homepage icon (themed/monochrome)
+    iconDetail: text("icon_detail"), // URL for detail page icon (color/full)
+    color: text("color"), // Brand color hex e.g. "#800080"
+    isActive: boolean("is_active").default(true).notNull(),
+    priority: integer("priority").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});

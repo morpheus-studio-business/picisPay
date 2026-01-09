@@ -15,6 +15,7 @@ import {
     Layers,
     Loader2,
     Image,
+    Palette,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
@@ -26,6 +27,7 @@ const menuItems = [
     { name: "Users", href: "/admin/users", icon: Users },
     { name: "Deposits", href: "/admin/topups", icon: CreditCard },
     { name: "Banners", href: "/admin/banners", icon: Image },
+    { name: "Brands", href: "/admin/brands", icon: Palette },
     { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
