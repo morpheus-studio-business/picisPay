@@ -86,15 +86,15 @@ function BannerSlider() {
   );
 }
 
-// Provider HP - link ke halaman provider dengan menu layanan
-const mobileProviders = [
-  { id: 1, name: "Telkomsel", brand: "TELKOMSEL", href: "/provider/telkomsel", color: "bg-red-600", image: "/provider/tsel.png" },
-  { id: 2, name: "Indosat", brand: "INDOSAT", href: "/provider/indosat", color: "bg-yellow-500", image: "/provider/indosat.png" },
-  { id: 3, name: "XL", brand: "XL", href: "/provider/xl", color: "bg-blue-600", image: "/provider/xl.png" },
-  { id: 4, name: "Axis", brand: "AXIS", href: "/provider/axis", color: "bg-purple-600", image: "/provider/axis.png" },
-  { id: 5, name: "Tri", brand: "THREE", href: "/provider/three", color: "bg-black", image: "/provider/tri.png" },
-  { id: 6, name: "Smartfren", brand: "SMARTFREN", href: "/provider/smartfren", color: "bg-pink-600", image: "/provider/smartfren.png" },
-  { id: 7, name: "By.U", brand: "BY.U", href: "/provider/byu", color: "bg-purple-500", image: "/provider/byu.png" },
+// Provider HP - fallback data (will be overridden by DB)
+const defaultMobileProviders = [
+  { id: "telkomsel", name: "Telkomsel", brand: "TELKOMSEL", href: "/provider/telkomsel", color: "bg-red-600", image: "/provider/tsel.png" },
+  { id: "indosat", name: "Indosat", brand: "INDOSAT", href: "/provider/indosat", color: "bg-yellow-500", image: "/provider/indosat.png" },
+  { id: "xl", name: "XL", brand: "XL", href: "/provider/xl", color: "bg-blue-600", image: "/provider/xl.png" },
+  { id: "axis", name: "Axis", brand: "AXIS", href: "/provider/axis", color: "bg-purple-600", image: "/provider/axis.png" },
+  { id: "three", name: "Tri", brand: "THREE", href: "/provider/three", color: "bg-black", image: "/provider/tri.png" },
+  { id: "smartfren", name: "Smartfren", brand: "SMARTFREN", href: "/provider/smartfren", color: "bg-pink-600", image: "/provider/smartfren.png" },
+  { id: "byu", name: "By.U", brand: "BY.U", href: "/provider/byu", color: "bg-purple-500", image: "/provider/byu.png" },
 ];
 
 // Layanan lainnya - langsung ke halaman masing-masing
@@ -117,6 +117,7 @@ export default function Home() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loadingNotifs, setLoadingNotifs] = useState(false);
   const [balance, setBalance] = useState(0);
+  const [mobileProviders, setMobileProviders] = useState(defaultMobileProviders);
 
   // Announcement State
   const [announcement, setAnnouncement] = useState('');
@@ -139,6 +140,23 @@ export default function Home() {
         if (data.success) {
           const announce = data.data.find((c: any) => c.key === 'announcement_text');
           if (announce) setAnnouncement(announce.value);
+        }
+      });
+
+    // Fetch Brands for homepage providers
+    fetch('/api/brands?category=data')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) {
+          const mappedProviders = data.data.map((brand: any) => ({
+            id: brand.id,
+            name: brand.name,
+            brand: brand.id.toUpperCase(),
+            href: `/provider/${brand.id}`,
+            color: brand.color ? `bg-[${brand.color}]` : 'bg-neutral-800',
+            image: brand.iconHome || brand.iconDetail || `/provider/${brand.id}.png`,
+          }));
+          setMobileProviders(mappedProviders);
         }
       });
   }, []);
