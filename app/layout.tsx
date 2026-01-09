@@ -41,6 +41,7 @@ export const metadata: Metadata = {
 };
 
 import { SiteHeader } from "@/components/site-header";
+import NotificationProvider from "@/components/NotificationProvider";
 
 // ... existing code ...
 
@@ -61,9 +62,11 @@ export default function RootLayout({
       >
         <div className="w-full md:max-w-full md:w-full md:shadow-none max-w-[430px] bg-black min-h-screen shadow-2xl relative overflow-x-hidden flex flex-col">
           <SiteHeader />
-          <div className="w-full md:max-w-7xl md:mx-auto flex-1">
-            {children}
-          </div>
+          <NotificationProvider>
+            <div className="w-full md:max-w-7xl md:mx-auto flex-1">
+              {children}
+            </div>
+          </NotificationProvider>
         </div>
       </body>
     </html>
