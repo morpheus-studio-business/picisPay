@@ -236,8 +236,8 @@ export default function Home() {
                 <X className="w-6 h-6" />
               </button>
 
-              <div className="w-16 h-16 bg-[#5eead4]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-8 h-8 text-[#5eead4]" />
+              <div className="w-16 h-16 bg-[#bef264]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-[#bef264]" />
               </div>
 
               <h3 className="text-xl font-bold mb-2">Harap Daftar / Masuk</h3>
@@ -248,7 +248,7 @@ export default function Home() {
               <div className="flex flex-col gap-3">
                 <Link
                   href="/login"
-                  className="w-full bg-[#5eead4] text-black font-bold py-3.5 rounded-2xl hover:bg-[#5eead4]/90 transition-colors"
+                  className="w-full bg-[#bef264] text-black font-bold py-3.5 rounded-2xl hover:bg-[#bef264]/90 transition-colors"
                 >
                   Masuk ke Akun
                 </Link>
@@ -276,7 +276,7 @@ export default function Home() {
             </>
           ) : (
             <div className="flex items-center gap-4">
-              <Link href="/login" className="text-sm font-bold text-[#5eead4] hover:text-[#5eead4]/80 transition-colors">
+              <Link href="/login" className="text-sm font-bold text-[#bef264] hover:text-[#bef264]/80 transition-colors">
                 Masuk / Daftar
               </Link>
             </div>
@@ -312,7 +312,7 @@ export default function Home() {
             <motion.div
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="bg-linear-to-br from-[#bef264] to-[#84cc16] rounded-[1.5rem] md:rounded-[2.5rem] px-5 py-4 md:px-8 md:py-6 relative overflow-hidden shadow-2xl hover:shadow-[#bef264]/20 transition-all duration-500 min-h-[80px] flex flex-col justify-center"
+              className="bg-linear-to-br from-[#bef264] to-[#84cc16] rounded-3xl md:rounded-[2.5rem] px-5 py-4 md:px-8 md:py-6 relative overflow-hidden shadow-2xl hover:shadow-[#bef264]/20 transition-all duration-500 min-h-[80px] flex flex-col justify-center"
             >
               {/* Abstract Pattern */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-black/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
@@ -330,7 +330,7 @@ export default function Home() {
                 </div>
 
                 {/* Quick Actions (+ Icon) */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <Link href="/topup" onClick={(e) => handleProtectedClick(e, '/topup')}>
                     <div className="flex flex-col items-center gap-2 cursor-pointer group">
                       <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-xl md:rounded-2xl flex items-center justify-center transition-transform active:scale-95 border border-black/5 group-hover:bg-neutral-900 shadow-sm">
@@ -372,7 +372,7 @@ export default function Home() {
                     transition={{ delay: idx * 0.05 }}
                     className="flex flex-col items-center gap-2 cursor-pointer group"
                   >
-                    <div className="w-12 h-12 md:w-20 md:h-20 rounded-[1rem] flex items-center justify-center bg-linear-to-br from-neutral-700 to-neutral-800 border border-neutral-700 overflow-hidden p-2 group-hover:border-[#bef264] transition-all">
+                    <div className="w-12 h-12 md:w-20 md:h-20 rounded-2xl flex items-center justify-center bg-linear-to-br from-neutral-700 to-neutral-800 border border-neutral-700 overflow-hidden p-2 group-hover:border-[#bef264] transition-all">
                       <img src={provider.image} alt={provider.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
                     </div>
                     <span className="text-[10px] md:text-xs font-medium text-neutral-400 group-hover:text-white transition-colors">{provider.name}</span>
@@ -394,7 +394,7 @@ export default function Home() {
                     transition={{ delay: idx * 0.05 + 0.2 }}
                     className="flex flex-col items-center gap-2 cursor-pointer group"
                   >
-                    <div className="w-12 h-12 md:w-20 md:h-20 bg-linear-to-br from-neutral-700 to-neutral-800 rounded-[1rem] flex items-center justify-center border border-neutral-700 group-hover:border-[#bef264] transition-all">
+                    <div className="w-12 h-12 md:w-20 md:h-20 bg-linear-to-br from-neutral-700 to-neutral-800 rounded-2xl flex items-center justify-center border border-neutral-700 group-hover:border-[#bef264] transition-all">
                       <service.icon className="w-5 h-5 md:w-6 md:h-6 text-white group-hover:text-[#bef264] transition-colors" />
                     </div>
                     <span className="text-[10px] md:text-xs text-neutral-400 font-medium group-hover:text-white transition-colors text-center leading-tight">{service.name}</span>
@@ -418,7 +418,7 @@ export default function Home() {
 
       {/* Bottom Navigation - Mobile Only */}
       <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50 pointer-events-none md:hidden">
-        <div className="bg-neutral-900/95 backdrop-blur-xl border border-neutral-800 rounded-[2rem] py-2 px-6 flex items-center gap-5 pointer-events-auto shadow-2xl shadow-black/80 ring-1 ring-white/5 mx-6">
+        <div className="bg-neutral-900/95 backdrop-blur-xl border border-neutral-800 rounded-4xl py-2 px-6 flex items-center gap-5 pointer-events-auto shadow-2xl shadow-black/80 ring-1 ring-white/5 mx-6">
 
           <Link href="/">
             <div className="w-11 h-11 flex items-center justify-center rounded-2xl text-white bg-white/5 shadow-inner cursor-pointer">
@@ -492,7 +492,7 @@ export default function Home() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className={`p-4 rounded-2xl border relative group ${notif.read ? 'bg-neutral-900 border-neutral-700' : 'bg-[#5eead4]/5 border-[#5eead4]/20'}`}
+                    className={`p-4 rounded-2xl border relative group ${notif.read ? 'bg-neutral-900 border-neutral-700' : 'bg-[#bef264]/5 border-[#bef264]/20'}`}
                   >
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(notif.id); }}
@@ -503,13 +503,13 @@ export default function Home() {
                     <div className="flex gap-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 
                                         ${notif.type === 'promo' ? 'bg-yellow-500/10 text-yellow-500' :
-                          notif.type === 'info' ? 'bg-blue-500/10 text-blue-500' : 'bg-[#5eead4]/10 text-[#5eead4]'}`}>
+                          notif.type === 'info' ? 'bg-blue-500/10 text-blue-500' : 'bg-[#bef264]/10 text-[#bef264]'}`}>
                         {notif.type === 'promo' ? <Gift className="w-5 h-5" /> :
                           notif.type === 'info' ? <Info className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-start mb-1">
-                          <h3 className={`font-bold text-sm ${notif.read ? 'text-white' : 'text-[#5eead4]'}`}>{notif.title}</h3>
+                          <h3 className={`font-bold text-sm ${notif.read ? 'text-white' : 'text-[#bef264]'}`}>{notif.title}</h3>
                           <span className="text-[10px] text-neutral-500 whitespace-nowrap ml-2">{notif.date}</span>
                         </div>
                         <p className="text-xs text-neutral-400 leading-relaxed">{notif.message}</p>
