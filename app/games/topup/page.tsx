@@ -29,10 +29,30 @@ export default function GamesTopUpPage() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [userId, setUserId] = useState('');
     const [serverId, setServerId] = useState('');
+    const [brandIcons, setBrandIcons] = useState<Record<string, string>>({});
 
     useEffect(() => {
         fetchAllProducts();
+        fetchBrandIcons();
     }, []);
+
+    const fetchBrandIcons = async () => {
+        try {
+            const res = await fetch('/api/brands?category=games');
+            const data = await res.json();
+            if (data.success) {
+                const icons: Record<string, string> = {};
+                data.data.forEach((brand: any) => {
+                    // Map brand ID to iconDetail (for detail pages) 
+                    icons[brand.id.toUpperCase()] = brand.iconDetail || brand.iconHome || '';
+                    icons[brand.name.toUpperCase()] = brand.iconDetail || brand.iconHome || '';
+                });
+                setBrandIcons(icons);
+            }
+        } catch (error) {
+            console.error('Failed to fetch brand icons:', error);
+        }
+    };
 
     const fetchAllProducts = async () => {
         try {
@@ -146,8 +166,16 @@ export default function GamesTopUpPage() {
                                     onClick={() => setSelectedBrand(brand)}
                                     className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 cursor-pointer hover:border-[#bef264] hover:bg-neutral-800 transition-all group flex flex-col items-center justify-center gap-2"
                                 >
-                                    <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center">
-                                        <Gamepad2 className="w-5 h-5 text-white" />
+                                    <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden">
+                                        {brandIcons[brand.brand] || brandIcons[brand.name.toUpperCase()] ? (
+                                            <img
+                                                src={brandIcons[brand.brand] || brandIcons[brand.name.toUpperCase()]}
+                                                alt={brand.name}
+                                                className="w-full h-full object-contain"
+                                            />
+                                        ) : (
+                                            <Gamepad2 className="w-5 h-5 text-white" />
+                                        )}
                                     </div>
                                     <span className="font-semibold text-xs text-white group-hover:text-[#bef264] text-center line-clamp-2">{brand.name}</span>
                                     <span className="text-[10px] text-neutral-500">{brand.productCount} produk</span>

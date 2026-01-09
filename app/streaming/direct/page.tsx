@@ -46,12 +46,34 @@ export default function StreamingDirectPage() {
     const [buying, setBuying] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [customerNo, setCustomerNo] = useState('');
+    const [brandIcons, setBrandIcons] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        fetchBrandIcons();
+    }, []);
 
     useEffect(() => {
         if (selectedProvider) {
             fetchProducts(selectedProvider.brand);
         }
     }, [selectedProvider]);
+
+    const fetchBrandIcons = async () => {
+        try {
+            const res = await fetch('/api/brands?category=streaming');
+            const data = await res.json();
+            if (data.success) {
+                const icons: Record<string, string> = {};
+                data.data.forEach((brand: any) => {
+                    icons[brand.id.toUpperCase()] = brand.iconDetail || brand.iconHome || '';
+                    icons[brand.name.toUpperCase()] = brand.iconDetail || brand.iconHome || '';
+                });
+                setBrandIcons(icons);
+            }
+        } catch (error) {
+            console.error('Failed to fetch brand icons:', error);
+        }
+    };
 
     const fetchProducts = async (brand: string) => {
         setLoading(true);
@@ -131,9 +153,13 @@ export default function StreamingDirectPage() {
                                 onClick={() => setSelectedProvider(provider)}
                                 className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 cursor-pointer hover:border-[#bef264] hover:bg-neutral-800 transition-all group flex flex-col items-center justify-center gap-3"
                             >
-                                {provider.image ? (
+                                {(brandIcons[provider.brand] || brandIcons[provider.name.toUpperCase()] || provider.image) ? (
                                     <div className="w-16 h-16 rounded-full overflow-hidden bg-white p-2">
-                                        <img src={provider.image} alt={provider.name} className="w-full h-full object-contain" />
+                                        <img
+                                            src={brandIcons[provider.brand] || brandIcons[provider.name.toUpperCase()] || provider.image!}
+                                            alt={provider.name}
+                                            className="w-full h-full object-contain"
+                                        />
                                     </div>
                                 ) : (
                                     <div className={`w-16 h-16 rounded-full ${provider.color} flex items-center justify-center`}>
