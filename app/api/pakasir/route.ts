@@ -128,11 +128,12 @@ export async function POST(request: NextRequest) {
 
             const payment = apiData.payment;
 
-            // Update the topup record with expiration time and payment details
+            // Update the topup record with expiration time, fee, and payment details
             await db.update(topups)
                 .set({
                     expiredAt: payment.expired_at ? new Date(payment.expired_at) : new Date(Date.now() + 24 * 60 * 60 * 1000), // Default 24h if not provided
                     paymentNumber: payment.payment_number,
+                    fee: payment.fee || 0, // Save the unique code / fee from PaKasir
                 })
                 .where(eq(topups.orderId, orderId));
 

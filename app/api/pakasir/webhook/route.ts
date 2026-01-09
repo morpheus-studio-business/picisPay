@@ -59,7 +59,9 @@ export async function POST(request: NextRequest) {
             });
 
             if (userRecord) {
-                const newBalance = userRecord.balance + topupRecord.amount;
+                // Credit the TOTAL amount paid (amount + fee/unique code)
+                const totalPaid = topupRecord.amount + (topupRecord.fee || 0);
+                const newBalance = userRecord.balance + totalPaid;
 
                 await db.update(user).set({
                     balance: newBalance,
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
                 await db.insert(balanceHistory).values({
                     userId: userRecord.id,
                     type: "topup",
-                    amount: topupRecord.amount,
+                    amount: totalPaid,
                     balanceBefore: userRecord.balance,
                     balanceAfter: newBalance,
                     referenceId: order_id,

@@ -40,6 +40,7 @@ export default function TopUpPage() {
     const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
     const [error, setError] = useState('');
     const [userBalance, setUserBalance] = useState(0);
+    const [countdown, setCountdown] = useState(900); // 15 minutes in seconds
 
     // Fetch current user balance
     useEffect(() => {
@@ -47,6 +48,33 @@ export default function TopUpPage() {
             setUserBalance((session.user as any).balance || 0);
         }
     }, [session]);
+
+    // Countdown timer when QR is displayed
+    useEffect(() => {
+        if (!paymentData) {
+            setCountdown(900); // Reset on new payment
+            return;
+        }
+
+        const timer = setInterval(() => {
+            setCountdown(prev => {
+                if (prev <= 0) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [paymentData]);
+
+    // Format countdown as MM:SS
+    const formatCountdown = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
 
     const minimumTopup = 10000;
 
@@ -124,9 +152,17 @@ export default function TopUpPage() {
                         </p>
                         <p className="text-xs text-neutral-500 mb-4">Total Pembayaran</p>
 
-                        <div className="w-full bg-yellow-50 text-yellow-800 text-xs px-4 py-3 rounded-xl border border-yellow-200">
-                            ⚠️ Pembayaran akan otomatis terdeteksi dalam 1-5 menit. Jangan tutup halaman ini sebelum pembayaran berhasil.
-                        </div>
+                        {countdown > 0 ? (
+                            <div className="w-full bg-yellow-50 text-yellow-800 text-xs px-4 py-3 rounded-xl border border-yellow-200 text-center">
+                                <p className="font-bold text-2xl mb-1">{formatCountdown(countdown)}</p>
+                                <p>⏳ Waktu pembayaran tersisa. Jangan tutup halaman ini.</p>
+                            </div>
+                        ) : (
+                            <div className="w-full bg-red-50 text-red-700 text-xs px-4 py-3 rounded-xl border border-red-200 text-center">
+                                <p className="font-bold text-lg mb-1">⚠️ Waktu Habis</p>
+                                <p>QR Code ini mungkin sudah tidak valid. Silakan buat transaksi baru.</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Order Info */}
