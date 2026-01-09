@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { db, topups } from "@/lib/db";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -126,6 +127,14 @@ export async function POST(request: NextRequest) {
             }
 
             const payment = apiData.payment;
+
+            // Update the topup record with expiration time and payment details
+            await db.update(topups)
+                .set({
+                    expiredAt: payment.expired_at ? new Date(payment.expired_at) : new Date(Date.now() + 24 * 60 * 60 * 1000), // Default 24h if not provided
+                    paymentNumber: payment.payment_number,
+                })
+                .where(eq(topups.orderId, orderId));
 
             // Return the real data from API
             return NextResponse.json({

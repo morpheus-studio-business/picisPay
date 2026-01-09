@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db, topups, transactions } from "@/lib/db";
 import { auth } from "@/lib/auth"; // We might need to handle auth differently if using client
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and, lt } from "drizzle-orm";
 import { headers } from "next/headers";
 
 export async function GET(req: Request) {
@@ -16,6 +16,18 @@ export async function GET(req: Request) {
         if (!session?.user) {
             return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
         }
+
+        // Auto-expire pending topups that are past their expiration time
+        const now = new Date();
+        await db.update(topups)
+            .set({ status: "expired" })
+            .where(
+                and(
+                    eq(topups.userId, session.user.id),
+                    eq(topups.status, "pending"),
+                    lt(topups.expiredAt, now)
+                )
+            );
 
         // Fetch Topups
         const userTopups = await db.select().from(topups)
