@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Wallet, Loader2, QrCode, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { useSession } from '@/lib/auth-client';
 
@@ -31,6 +32,7 @@ interface PaymentData {
 }
 
 export default function TopUpPage() {
+    const router = useRouter();
     const { data: session } = useSession();
     const [selectedAmount, setSelectedAmount] = useState(0);
     const [selectedMethod, setSelectedMethod] = useState('qris');
@@ -142,18 +144,44 @@ export default function TopUpPage() {
                     <div className="space-y-3 mb-6">
                         <button
                             onClick={async () => {
-                                // Manual check status button
+                                if (!paymentData) return;
+
+                                const btn = document.getElementById('btn-check-status') as HTMLButtonElement;
+                                if (btn) btn.disabled = true;
+                                const originalText = btn ? btn.innerText : '';
+                                if (btn) btn.innerText = 'Memeriksa...';
+
                                 try {
-                                    // In real app, we might poll an endpoint that checks DB
-                                    // But here we rely on webhook updating DB, so we check our local DB status?
-                                    // Or user closes webview and comes back.
-                                    alert('Silakan cek riwayat saldo anda nanti.');
-                                    resetPayment();
+                                    // Call our internal API which checks Pakasir
+                                    const res = await fetch(`/api/pakasir/status?order_id=${paymentData.order_id}&amount=${paymentData.total_payment}`);
+                                    const data = await res.json();
+
+                                    if (data.success && data.data) {
+                                        const status = data.data.status;
+                                        if (status === 'success' || status === 'paid' || status === 'completed') {
+                                            alert('✅ Pembayaran Berhasil! Saldo telah ditambahkan.');
+                                            router.refresh(); // Refresh to update balance in UI
+                                            resetPayment();
+                                        } else if (status === 'mismatch') {
+                                            alert('⚠️ Pembayaran terdeteksi namun nominal tidak sesuai. Hubungi Admin.');
+                                        } else {
+                                            alert('⏳ Pembayaran belum terkonfirmasi. Silakan tunggu beberapa saat lagi.');
+                                        }
+                                    } else {
+                                        alert('⏳ Belum ada pembayaran masuk. Pastikan nominal transfer sesuai.');
+                                    }
                                 } catch (err) {
-                                    alert('Terjadi kesalahan');
+                                    console.error(err);
+                                    alert('Gagal mengecek status. Silakan coba lagi.');
+                                } finally {
+                                    if (btn) {
+                                        btn.disabled = false;
+                                        btn.innerText = originalText;
+                                    }
                                 }
                             }}
-                            className="w-full bg-neutral-800 border border-neutral-700 text-white font-semibold rounded-2xl py-4 hover:bg-neutral-700 transition-colors"
+                            id="btn-check-status"
+                            className="w-full bg-neutral-800 border border-neutral-700 text-white font-semibold rounded-2xl py-4 hover:bg-neutral-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             🔄 Saya Sudah Bayar
                         </button>

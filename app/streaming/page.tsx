@@ -36,9 +36,9 @@ export default function StreamingPage() {
                     Pilih Jenis
                 </h3>
 
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                     {streamingMenus.map((menu, idx) => (
-                        <Link href={menu.href} key={menu.id}>
+                        <Link href={menu.href} key={menu.id} className="block">
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
