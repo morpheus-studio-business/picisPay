@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, RefreshCw, Plus, Minus, Loader2 } from "lucide-react";
 
 interface User {
     id: string;
@@ -9,12 +9,26 @@ interface User {
     name: string | null;
     balance: number;
     createdAt: string;
+    role?: string;
+    level?: string;
 }
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+
+    // Edit Level Modal
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [editForm, setEditForm] = useState({ role: '', level: '' });
+    const [saving, setSaving] = useState(false);
+
+    // Balance Modal
+    const [balanceUser, setBalanceUser] = useState<User | null>(null);
+    const [balanceType, setBalanceType] = useState<'add' | 'subtract'>('add');
+    const [balanceAmount, setBalanceAmount] = useState('');
+    const [balanceReason, setBalanceReason] = useState('');
+    const [balanceSaving, setBalanceSaving] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -41,15 +55,11 @@ export default function UsersPage() {
             (u.name && u.name.toLowerCase().includes(search.toLowerCase()))
     );
 
-    const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [editForm, setEditForm] = useState({ role: '', level: '' });
-    const [saving, setSaving] = useState(false);
-
     const handleEdit = (user: User) => {
         setEditingUser(user);
         setEditForm({
-            role: (user as any).role || 'user',
-            level: (user as any).level || 'member'
+            role: user.role || 'user',
+            level: user.level || 'member'
         });
     };
 
@@ -69,7 +79,7 @@ export default function UsersPage() {
             const data = await res.json();
             if (data.success) {
                 setEditingUser(null);
-                fetchUsers(); // Refresh list
+                fetchUsers();
             } else {
                 alert('Gagal update user');
             }
@@ -80,6 +90,51 @@ export default function UsersPage() {
         }
     };
 
+    // Balance Adjustment Handlers
+    const openBalanceModal = (user: User, type: 'add' | 'subtract') => {
+        setBalanceUser(user);
+        setBalanceType(type);
+        setBalanceAmount('');
+        setBalanceReason('');
+    };
+
+    const handleBalanceAdjust = async () => {
+        if (!balanceUser || !balanceAmount || !balanceReason) {
+            alert('Isi nominal dan alasan');
+            return;
+        }
+        setBalanceSaving(true);
+        try {
+            const res = await fetch('/api/admin/users/balance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: balanceUser.id,
+                    amount: parseInt(balanceAmount),
+                    type: balanceType,
+                    reason: balanceReason
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`Saldo berhasil ${balanceType === 'add' ? 'ditambah' : 'dikurangi'}!\nSaldo baru: Rp ${data.data.balanceAfter.toLocaleString('id-ID')}`);
+                setBalanceUser(null);
+                fetchUsers();
+            } else {
+                alert(data.error || 'Gagal adjust saldo');
+            }
+        } catch (error) {
+            console.error('Failed to adjust balance:', error);
+            alert('Terjadi kesalahan');
+        } finally {
+            setBalanceSaving(false);
+        }
+    };
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('id-ID').format(amount);
+    };
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -87,7 +142,7 @@ export default function UsersPage() {
                 <div>
                     <h1 className="text-2xl font-bold">Users</h1>
                     <p className="text-neutral-500 text-sm mt-1">
-                        Kelola semua pengguna aplikasi (Level & Role)
+                        Kelola pengguna, level, dan saldo
                     </p>
                 </div>
                 <button
@@ -122,7 +177,7 @@ export default function UsersPage() {
                                 <th className="text-left px-6 py-4 text-sm font-medium text-neutral-500">Level</th>
                                 <th className="text-right px-6 py-4 text-sm font-medium text-neutral-500">Saldo</th>
                                 <th className="text-left px-6 py-4 text-sm font-medium text-neutral-500">Terdaftar</th>
-                                <th className="text-right px-6 py-4 text-sm font-medium text-neutral-500">Aksi</th>
+                                <th className="text-center px-6 py-4 text-sm font-medium text-neutral-500">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -137,24 +192,40 @@ export default function UsersPage() {
                                         <td className="px-6 py-4 text-sm text-neutral-400">{user.name || "-"}</td>
                                         <td className="px-6 py-4 text-sm">
                                             <span className={`px-2 py-1 rounded text-xs font-semibold
-                                                ${(user as any).level === 'vip' ? 'bg-yellow-500/10 text-yellow-500' :
-                                                    (user as any).level === 'reseller' ? 'bg-blue-500/10 text-blue-500' : 'bg-neutral-800 text-neutral-400'}`}>
-                                                {(user as any).level?.toUpperCase() || 'MEMBER'}
+                                                ${user.level === 'vip' ? 'bg-yellow-500/10 text-yellow-500' :
+                                                    user.level === 'reseller' ? 'bg-blue-500/10 text-blue-500' : 'bg-neutral-800 text-neutral-400'}`}>
+                                                {user.level?.toUpperCase() || 'MEMBER'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-right font-semibold text-[#bef264]">
-                                            Rp {user.balance.toLocaleString("id-ID")}
+                                            Rp {formatCurrency(user.balance)}
                                         </td>
                                         <td className="px-6 py-4 text-sm text-neutral-500">
                                             {new Date(user.createdAt).toLocaleDateString("id-ID")}
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-right">
-                                            <button
-                                                onClick={() => handleEdit(user)}
-                                                className="text-[#bef264] hover:underline"
-                                            >
-                                                Edit
-                                            </button>
+                                        <td className="px-6 py-4 text-sm">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => openBalanceModal(user, 'add')}
+                                                    className="w-8 h-8 bg-green-500/10 text-green-500 rounded-lg flex items-center justify-center hover:bg-green-500/20"
+                                                    title="Tambah Saldo"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => openBalanceModal(user, 'subtract')}
+                                                    className="w-8 h-8 bg-red-500/10 text-red-500 rounded-lg flex items-center justify-center hover:bg-red-500/20"
+                                                    title="Kurangi Saldo"
+                                                >
+                                                    <Minus className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEdit(user)}
+                                                    className="text-[#bef264] hover:underline text-xs"
+                                                >
+                                                    Edit
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -179,26 +250,40 @@ export default function UsersPage() {
                                     <div className="text-sm text-neutral-400 mt-1">{user.phone || "-"}</div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="text-[#bef264] font-bold">Rp {user.balance.toLocaleString("id-ID")}</div>
+                                    <div className="text-[#bef264] font-bold">Rp {formatCurrency(user.balance)}</div>
                                     <span className={`inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-semibold
-                                        ${(user as any).level === 'vip' ? 'bg-yellow-500/10 text-yellow-500' :
-                                            (user as any).level === 'reseller' ? 'bg-blue-500/10 text-blue-500' : 'bg-neutral-800 text-neutral-400'}`}>
-                                        {(user as any).level?.toUpperCase() || 'MEMBER'}
+                                        ${user.level === 'vip' ? 'bg-yellow-500/10 text-yellow-500' :
+                                            user.level === 'reseller' ? 'bg-blue-500/10 text-blue-500' : 'bg-neutral-800 text-neutral-400'}`}>
+                                        {user.level?.toUpperCase() || 'MEMBER'}
                                     </span>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => handleEdit(user)}
-                                className="w-full py-2 bg-neutral-800 rounded-lg text-sm font-medium hover:bg-neutral-700 transition-colors"
-                            >
-                                Edit Level
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => openBalanceModal(user, 'add')}
+                                    className="flex-1 py-2 bg-green-500/10 text-green-500 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
+                                >
+                                    <Plus className="w-4 h-4" /> Tambah
+                                </button>
+                                <button
+                                    onClick={() => openBalanceModal(user, 'subtract')}
+                                    className="flex-1 py-2 bg-red-500/10 text-red-500 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
+                                >
+                                    <Minus className="w-4 h-4" /> Kurangi
+                                </button>
+                                <button
+                                    onClick={() => handleEdit(user)}
+                                    className="px-4 py-2 bg-neutral-800 rounded-lg text-sm font-medium hover:bg-neutral-700 transition-colors"
+                                >
+                                    Edit
+                                </button>
+                            </div>
                         </div>
                     ))
                 )}
             </div>
 
-            {/* Edit Modal */}
+            {/* Edit Level Modal */}
             {editingUser && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                     <div className="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6">
@@ -247,6 +332,73 @@ export default function UsersPage() {
                                     className="px-4 py-2 bg-[#bef264] text-black font-bold rounded-lg hover:bg-[#a3cf53]"
                                 >
                                     {saving ? 'Menyimpan...' : 'Simpan'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Balance Adjustment Modal */}
+            {balanceUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md p-6">
+                        <h3 className="text-lg font-bold mb-2">
+                            {balanceType === 'add' ? '➕ Tambah Saldo' : '➖ Kurangi Saldo'}
+                        </h3>
+                        <p className="text-sm text-neutral-400 mb-4">
+                            User: <span className="text-white font-medium">{balanceUser.name || balanceUser.phone}</span>
+                            <br />
+                            Saldo saat ini: <span className="text-[#bef264] font-semibold">Rp {formatCurrency(balanceUser.balance)}</span>
+                        </p>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm text-neutral-400 mb-1">Nominal (Rp)</label>
+                                <input
+                                    type="number"
+                                    value={balanceAmount}
+                                    onChange={(e) => setBalanceAmount(e.target.value)}
+                                    placeholder="Contoh: 50000"
+                                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-3 focus:border-[#bef264] outline-none text-lg font-bold"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-neutral-400 mb-1">Alasan / Keterangan *</label>
+                                <input
+                                    type="text"
+                                    value={balanceReason}
+                                    onChange={(e) => setBalanceReason(e.target.value)}
+                                    placeholder="Contoh: Transfer Bank BCA"
+                                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 focus:border-[#bef264] outline-none"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 mt-6">
+                                <button
+                                    onClick={() => setBalanceUser(null)}
+                                    className="px-4 py-2 text-neutral-400 hover:text-white"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    onClick={handleBalanceAdjust}
+                                    disabled={balanceSaving}
+                                    className={`px-4 py-2 font-bold rounded-lg flex items-center gap-2
+                                        ${balanceType === 'add'
+                                            ? 'bg-green-500 text-white hover:bg-green-600'
+                                            : 'bg-red-500 text-white hover:bg-red-600'}`}
+                                >
+                                    {balanceSaving ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : balanceType === 'add' ? (
+                                        <>
+                                            <Plus className="w-4 h-4" /> Tambah
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Minus className="w-4 h-4" /> Kurangi
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
