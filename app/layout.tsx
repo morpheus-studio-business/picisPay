@@ -21,8 +21,37 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "picisPay",
-  description: "Aplikasi Konter & PPOB Terlengkap",
+  metadataBase: new URL('https://picispay.id'),
+  title: {
+    default: "PicisPay - Aplikasi Konter & PPOB Terlengkap",
+    template: "%s | PicisPay"
+  },
+  description: "Platform Top Up Game, Pulsa, Data, dan PPOB termurah dan terpercaya. Transaksi otomatis 24 jam dengan berbagai metode pembayaran.",
+  keywords: ["top up game", "pulsa murah", "paket data", "ppob", "mobile legends", "free fire", "voucher game"],
+  authors: [{ name: "PicisPay Team" }],
+  creator: "PicisPay",
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://picispay.id",
+    title: "PicisPay - Solusi Top Up & PPOB",
+    description: "Top Up Game & PPOB Termurah. Proses otomatis detik-an. Tersedia Mobile Legends, FF, Genshin Impact, dan ratusan game lainnya.",
+    siteName: "PicisPay",
+    images: [
+      {
+        url: "/og-image.jpg", // Ensure this exists or fallback to logo
+        width: 1200,
+        height: 630,
+        alt: "PicisPay Banner",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PicisPay - Aplikasi Konter & PPOB",
+    description: "Solusi pembayaran digital termurah dan tercepat.",
+    // images: ["/og-image.jpg"],
+  },
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -36,7 +65,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "picisPay",
+    title: "PicisPay",
   },
 };
 
