@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Loader2, Globe, Phone, DollarSign, AlertTriangle, Megaphone } from 'lucide-react';
+import { Save, Loader2, Globe, Phone, DollarSign, AlertTriangle, Megaphone, Send } from 'lucide-react';
 
 interface Config {
     key: string;
@@ -54,6 +54,7 @@ export default function SettingsPage() {
         switch (key) {
             case 'site_name': return <Globe className="w-5 h-5 text-blue-400" />;
             case 'wa_admin': return <Phone className="w-5 h-5 text-green-400" />;
+            case 'telegram_admin': return <Send className="w-5 h-5 text-sky-400" />;
             case 'global_margin': return <DollarSign className="w-5 h-5 text-yellow-400" />;
             case 'maintenance_mode': return <AlertTriangle className="w-5 h-5 text-red-400" />;
             case 'announcement_text': return <Megaphone className="w-5 h-5 text-purple-400" />;
