@@ -279,6 +279,7 @@ export function filterGamesTopUp(products: Product[]): Product[] {
     return products.filter(p => {
         const brand = p.brand.toUpperCase();
         const rawCat = p.category.toUpperCase();
+        const name = p.product_name.toUpperCase();
 
         // Must be Games category
         if (!rawCat.includes('GAME')) return false;
@@ -289,6 +290,12 @@ export function filterGamesTopUp(products: Product[]): Product[] {
 
         // Check if product status is active
         return p.buyer_product_status && p.seller_product_status;
+    }).map(p => {
+        // Special Handling: Split Mobile Legends Global
+        if (p.brand.toUpperCase() === 'MOBILE LEGENDS' && p.product_name.toUpperCase().includes('GLOBAL')) {
+            return { ...p, brand: 'MOBILE LEGENDS GLOBAL' };
+        }
+        return p;
     });
 }
 

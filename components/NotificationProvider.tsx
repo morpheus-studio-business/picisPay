@@ -115,7 +115,7 @@ export default function NotificationProvider({ children }: { children: React.Rea
             {children}
 
             {/* Toast Container */}
-            <div className="fixed top-4 right-4 z-[100] space-y-2 max-w-sm">
+            <div className="fixed top-4 right-4 z-100 space-y-2 max-w-sm">
                 <AnimatePresence>
                     {toasts.map((toast) => (
                         <motion.div

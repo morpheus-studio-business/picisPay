@@ -20,6 +20,65 @@ const formatBrandName = (brand: string): string => {
         .join(' ');
 };
 
+// Configuration for Game Inputs
+const GAME_INPUT_CONFIG: Record<string, {
+    labelUserId: string;
+    hasServerId: boolean;
+    serverIdLabel?: string;
+    isServerIdDropdown?: boolean;
+    serverOptions?: string[];
+    placeholderUserId?: string;
+    placeholderServerId?: string;
+    serverIdType?: 'text' | 'number';
+}> = {
+    'MOBILE LEGENDS': {
+        labelUserId: 'User ID',
+        hasServerId: true,
+        serverIdLabel: 'Zone ID',
+        placeholderUserId: 'Contoh: 12345678',
+        placeholderServerId: 'Contoh: 12345',
+        serverIdType: 'number',
+    },
+    'MOBILE LEGENDS GLOBAL': {
+        labelUserId: 'User ID',
+        hasServerId: true,
+        serverIdLabel: 'Zone ID',
+        placeholderUserId: 'Contoh: 12345678',
+        placeholderServerId: 'Contoh: 12345',
+        serverIdType: 'number',
+    },
+    'GENSHIN IMPACT': {
+        labelUserId: 'UID',
+        hasServerId: true,
+        serverIdLabel: 'Server',
+        isServerIdDropdown: true,
+        serverOptions: ['Asia', 'America', 'Europe', 'TW,HK,MO'],
+        placeholderUserId: 'Contoh: 800000000',
+    },
+    'HONKAI: STAR RAIL': {
+        labelUserId: 'UID',
+        hasServerId: true,
+        serverIdLabel: 'Server',
+        isServerIdDropdown: true,
+        serverOptions: ['Asia', 'America', 'Europe', 'TW,HK,MO'],
+    },
+    'FREE FIRE': {
+        labelUserId: 'Player ID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 12345678',
+    },
+    'PUBG MOBILE': {
+        labelUserId: 'ID Pemain',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 5123456789',
+    },
+    'VALORANT': {
+        labelUserId: 'Riot ID',
+        hasServerId: false,
+        placeholderUserId: 'Username#Tag',
+    },
+};
+
 export default function GamesTopUpPage() {
     const router = useRouter();
     const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
@@ -30,6 +89,19 @@ export default function GamesTopUpPage() {
     const [userId, setUserId] = useState('');
     const [serverId, setServerId] = useState('');
     const [brandIcons, setBrandIcons] = useState<Record<string, string>>({});
+
+    const getConfig = (brandName: string) => {
+        const key = brandName.toUpperCase();
+        return GAME_INPUT_CONFIG[key] || {
+            labelUserId: 'User ID',
+            hasServerId: true,
+            serverIdLabel: 'Server ID (Opsional)',
+            placeholderUserId: 'Masukkan User ID...',
+            placeholderServerId: 'Masukkan Server ID (jika ada)...'
+        };
+    };
+
+    const config = selectedBrand ? getConfig(selectedBrand.brand) : null;
 
     useEffect(() => {
         fetchAllProducts();
@@ -209,35 +281,53 @@ export default function GamesTopUpPage() {
             </header>
 
             <div className="px-6 py-6">
-                {/* Input at Top */}
+                {/* Input at Top - Dynamic based on Game */}
                 <div className="space-y-3 mb-6">
+                    {/* User ID Input */}
                     <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4">
-                        <label className="text-xs text-neutral-500 block mb-2">User ID / ID Game</label>
+                        <label className="text-xs text-neutral-500 block mb-2">{config?.labelUserId || 'User ID'}</label>
                         <div className="flex items-center gap-3">
                             <User className="w-5 h-5 text-neutral-500" />
                             <input
                                 type="text"
                                 value={userId}
                                 onChange={(e) => setUserId(e.target.value)}
-                                placeholder="Masukkan User ID..."
+                                placeholder={config?.placeholderUserId || 'Masukkan User ID...'}
                                 className="w-full bg-transparent text-lg font-bold text-white placeholder:text-neutral-700 focus:outline-none"
                                 autoFocus
                             />
                         </div>
                     </div>
-                    <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4">
-                        <label className="text-xs text-neutral-500 block mb-2">Server ID (Opsional)</label>
-                        <div className="flex items-center gap-3">
-                            <Server className="w-5 h-5 text-neutral-500" />
-                            <input
-                                type="text"
-                                value={serverId}
-                                onChange={(e) => setServerId(e.target.value)}
-                                placeholder="Masukkan Server ID jika ada..."
-                                className="w-full bg-transparent text-lg font-bold text-white placeholder:text-neutral-700 focus:outline-none"
-                            />
+
+                    {/* Server ID Input (Conditional) */}
+                    {config?.hasServerId && (
+                        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4">
+                            <label className="text-xs text-neutral-500 block mb-2">{config.serverIdLabel || 'Server ID'}</label>
+                            <div className="flex items-center gap-3">
+                                <Server className="w-5 h-5 text-neutral-500" />
+                                {config.isServerIdDropdown ? (
+                                    <select
+                                        value={serverId}
+                                        onChange={(e) => setServerId(e.target.value)}
+                                        className="w-full bg-transparent text-lg font-bold text-white focus:outline-none appearance-none cursor-pointer"
+                                    >
+                                        <option value="" disabled className="bg-neutral-900 text-neutral-500">Pilih Server</option>
+                                        {config.serverOptions?.map(opt => (
+                                            <option key={opt} value={opt} className="bg-neutral-900 text-white">{opt}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <input
+                                        type={config.serverIdType || "text"}
+                                        value={serverId}
+                                        onChange={(e) => setServerId(e.target.value)}
+                                        placeholder={config.placeholderServerId || 'Masukkan Server ID...'}
+                                        className="w-full bg-transparent text-lg font-bold text-white placeholder:text-neutral-700 focus:outline-none"
+                                    />
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Products */}
