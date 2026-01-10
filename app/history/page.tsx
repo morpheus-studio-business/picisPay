@@ -100,6 +100,46 @@ export default function HistoryPage() {
         window.print();
     };
 
+    const handleShare = async () => {
+        if (!selectedTrx) return;
+
+        const storeName = session?.user?.storeName || session?.user?.name || "picisPay Cell";
+        // Create a formatted receipt text
+        const shareText = `*STRUK TRANSAKSI*
+${storeName}
+--------------------------------
+Tanggal : ${formatDate(selectedTrx.date)}
+No. Ref : ${selectedTrx.type === 'purchase' ? selectedTrx.details.refId : selectedTrx.details.orderId}
+Produk  : ${selectedTrx.title}
+Tujuan  : ${selectedTrx.description}
+SN      : ${selectedTrx.details.sn || '-'}
+--------------------------------
+Total   : ${formatCurrency(parseInt(sellingPrice) || 0)}
+Status  : ${selectedTrx.status}
+
+Simpan struk ini sebagai bukti pembayaran.
+Terima Kasih!`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Struk Transaksi',
+                    text: shareText,
+                });
+            } catch (error) {
+                console.log('Error sharing:', error);
+            }
+        } else {
+            // Fallback: Copy to clipboard
+            try {
+                await navigator.clipboard.writeText(shareText);
+                alert('Struk berhasil disalin ke clipboard!');
+            } catch (err) {
+                alert('Gagal menyalin struk.');
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-black text-white pb-24 font-sans print:bg-white print:text-black">
             {/* Header - Hide on Print and Desktop */}
@@ -268,7 +308,10 @@ export default function HistoryPage() {
                                     <Printer className="w-5 h-5" />
                                     Cetak
                                 </button>
-                                <button className="flex-1 bg-neutral-800 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-neutral-700 transition-colors">
+                                <button
+                                    onClick={handleShare}
+                                    className="flex-1 bg-neutral-800 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-neutral-700 transition-colors"
+                                >
                                     <Share2 className="w-5 h-5" />
                                     Share
                                 </button>
