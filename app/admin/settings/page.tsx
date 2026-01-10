@@ -24,7 +24,26 @@ export default function SettingsPage() {
             const res = await fetch('/api/admin/settings');
             const data = await res.json();
             if (data.success) {
-                setConfigs(data.data);
+                // Ensure all standard keys exist
+                const standardKeys = [
+                    { key: 'site_name', description: 'Nama Website', value: '' },
+                    { key: 'announcement_text', description: 'Teks Pengumuman', value: '' },
+                    { key: 'wa_admin', description: 'Nomor WhatsApp Admin (628...)', value: '' },
+                    { key: 'telegram_admin', description: 'Username Telegram Admin', value: '' },
+                    { key: 'email_support', description: 'Email Support', value: '' },
+                    { key: 'global_margin', description: 'Margin Global (%)', value: '0' },
+                    { key: 'maintenance_mode', description: 'Mode Maintenance', value: 'false' },
+                ];
+
+                const mergedConfigs = standardKeys.map(std => {
+                    const existing = data.data.find((c: any) => c.key === std.key);
+                    return existing ? existing : std;
+                });
+
+                // Add any extra custom keys that might exist in DB but not in standardKeys
+                const extraKeys = data.data.filter((c: any) => !standardKeys.find(std => std.key === c.key));
+
+                setConfigs([...mergedConfigs, ...extraKeys]);
             }
         } catch (error) {
             console.error('Failed to fetch configs:', error);
