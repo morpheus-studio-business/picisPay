@@ -77,6 +77,91 @@ const GAME_INPUT_CONFIG: Record<string, {
         hasServerId: false,
         placeholderUserId: 'Username#Tag',
     },
+    'HIGGS DOMINO': {
+        labelUserId: 'User ID',
+        hasServerId: false,
+        placeholderUserId: 'Masukkan ID Pengguna',
+    },
+    'CALL OF DUTY MOBILE': {
+        labelUserId: 'OpenID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 12345678901234567',
+    },
+    'ARENA OF VALOR': {
+        labelUserId: 'User ID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 1234567890123456',
+    },
+    'POINT BLANK': {
+        labelUserId: 'User ID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: Zepetto ID',
+    },
+    'RAGNAROK M: ETERNAL LOVE': {
+        labelUserId: 'User ID',
+        hasServerId: true,
+        serverIdLabel: 'Zone ID',
+        placeholderUserId: 'ID Karakter',
+        placeholderServerId: 'Zone ID',
+        serverIdType: 'number',
+    },
+    'LIFEAFTER': {
+        labelUserId: 'Account ID',
+        hasServerId: true,
+        serverIdLabel: 'Server ID',
+        placeholderUserId: 'Account ID',
+        placeholderServerId: 'Server ID',
+    },
+    'BRAWL STARS': {
+        labelUserId: 'Player Tag',
+        hasServerId: false,
+        placeholderUserId: '#TAG123',
+    },
+    'CLASH OF CLANS': {
+        labelUserId: 'Player Tag',
+        hasServerId: false,
+        placeholderUserId: '#TAG123',
+    },
+    'CLASH ROYALE': {
+        labelUserId: 'Player Tag',
+        hasServerId: false,
+        placeholderUserId: '#TAG123',
+    },
+    'SAUSAGE MAN': {
+        labelUserId: 'Character ID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 12345',
+    },
+    'GROWTOPIA': {
+        labelUserId: 'GrowID',
+        hasServerId: true,
+        serverIdLabel: 'World Name',
+        placeholderUserId: 'Masukkan GrowID',
+        placeholderServerId: 'Nama World',
+        serverIdType: 'text',
+    },
+    'SUPER SUS': {
+        labelUserId: 'Space ID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 12345678',
+    },
+    'UNDAWN': {
+        labelUserId: 'Player ID',
+        hasServerId: true,
+        serverIdLabel: 'Server',
+        placeholderUserId: 'Contoh: 12345678',
+        placeholderServerId: 'Contoh: Raven',
+    },
+    'LITA': {
+        labelUserId: 'User ID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 1234567',
+    },
+    'FIFA MOBILE': {
+        labelUserId: 'UID',
+        hasServerId: false,
+        placeholderUserId: 'Contoh: 1234567890',
+    },
 };
 
 export default function GamesTopUpPage() {
