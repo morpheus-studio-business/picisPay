@@ -4,7 +4,35 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, MessageCircle, Phone, Mail, HelpCircle, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
+import { useState, useEffect } from 'react';
+
 export default function SupportPage() {
+    const [waNumber, setWaNumber] = useState('');
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetch('/api/config');
+                const json = await res.json();
+                if (json.success) {
+                    const waConfig = json.data.find((c: any) => c.key === 'wa_admin');
+                    if (waConfig) {
+                        setWaNumber(waConfig.value);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch config", error);
+            }
+        };
+        fetchConfig();
+    }, []);
+
+    const handleWaClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const number = waNumber || '6281234567890'; // Default fallback
+        window.open(`https://wa.me/${number}`, '_blank');
+    };
+
     return (
         <div className="min-h-screen bg-black text-white pb-24 font-sans">
             {/* Header */}
@@ -26,9 +54,8 @@ export default function SupportPage() {
 
             {/* Contact Options */}
             <div className="px-6 space-y-4">
-                <motion.a
-                    href="https://wa.me/"
-                    target="_blank"
+                <motion.div
+                    onClick={handleWaClick}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="bg-[#bef264] text-black rounded-3xl p-5 flex items-center gap-4 cursor-pointer hover:bg-[#bef264]/90 transition-colors"
@@ -41,7 +68,7 @@ export default function SupportPage() {
                         <p className="text-xs text-black/70">Respon cepat (Recommended)</p>
                     </div>
                     <ChevronRight className="w-5 h-5 opacity-70" />
-                </motion.a>
+                </motion.div>
 
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
