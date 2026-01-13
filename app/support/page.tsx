@@ -88,7 +88,7 @@ export default function SupportPage() {
                             onClick={handleWaClick}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="bg-[#bef264] text-black rounded-3xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#bef264]/90 transition-colors text-center aspect-[4/3] sm:aspect-auto sm:flex-row sm:text-left shadow-lg shadow-[#bef264]/10"
+                            className="bg-[#bef264] text-black rounded-3xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#bef264]/90 transition-colors text-center aspect-4/3 sm:aspect-auto sm:flex-row sm:text-left shadow-lg shadow-[#bef264]/10"
                         >
                             <div className="w-12 h-12 bg-black/10 rounded-2xl flex items-center justify-center mb-1 sm:mb-0">
                                 <MessageCircle className="w-6 h-6 fill-current text-black" />
@@ -105,7 +105,7 @@ export default function SupportPage() {
                             onClick={handleTelegramClick}
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="bg-[#229ED9] text-white rounded-3xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#229ED9]/90 transition-colors text-center aspect-[4/3] sm:aspect-auto sm:flex-row sm:text-left shadow-lg shadow-[#229ED9]/20"
+                            className="bg-[#229ED9] text-white rounded-3xl p-5 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#229ED9]/90 transition-colors text-center aspect-4/3 sm:aspect-auto sm:flex-row sm:text-left shadow-lg shadow-[#229ED9]/20"
                         >
                             <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mb-1 sm:mb-0">
                                 <Send className="w-6 h-6 fill-current text-white -ml-0.5 mt-0.5" />
