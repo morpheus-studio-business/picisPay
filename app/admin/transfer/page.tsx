@@ -87,8 +87,8 @@ export default function AdminTransferPage() {
             {result && (
                 <div
                     className={`mb-6 p-4 rounded-xl border ${result.success
-                            ? "bg-green-500/10 border-green-500/30 text-green-400"
-                            : "bg-red-500/10 border-red-500/30 text-red-400"
+                        ? "bg-green-500/10 border-green-500/30 text-green-400"
+                        : "bg-red-500/10 border-red-500/30 text-red-400"
                         }`}
                 >
                     <div className="flex items-start gap-3">
@@ -151,8 +151,8 @@ export default function AdminTransferPage() {
                             })
                         }
                         required
-                        placeholder="Contoh: 1234567890"
-                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#bef264] transition-colors"
+                        placeholder=""
+                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white focus:outline-none focus:border-[#bef264] transition-colors"
                     />
                 </div>
 
@@ -168,8 +168,8 @@ export default function AdminTransferPage() {
                             setFormData({ ...formData, accountName: e.target.value })
                         }
                         required
-                        placeholder="Contoh: JOHN DOE"
-                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#bef264] transition-colors uppercase"
+                        placeholder=""
+                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white focus:outline-none focus:border-[#bef264] transition-colors uppercase"
                     />
                 </div>
 
@@ -263,10 +263,6 @@ export default function AdminTransferPage() {
                         </>
                     )}
                 </button>
-
-                <p className="text-xs text-neutral-500 text-center">
-                    ⚠️ Ini adalah fitur percobaan. Transaksi tidak akan diproses secara nyata.
-                </p>
             </form>
         </div>
     );
